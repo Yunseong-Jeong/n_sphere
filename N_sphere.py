@@ -25,8 +25,6 @@ def convert_spherical(input, digits= None):
         result.append(math.acos(input[-2]/r))
     else:
         result.append(2*math.pi - math.acos(input[-2] /r))
-
-    print(result)
     if(ischeck): #input == Numpy
         result = np.array(result)
     return result
