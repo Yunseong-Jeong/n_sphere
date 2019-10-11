@@ -11,11 +11,8 @@ def convert_spherical(input):
             input = input.flatten
         input = input.tolist()
         ischeck =True
-    print(len(input))
     r = 0
-    # bug i -> 0, 1, 2 correct
-    # current i-> 0, 2 end
-    for i in (0, len(input)-1):
+    for i in range(0, len(input)):
         r += input[i]*input[i]
     r = math.sqrt(r);
     result = [r]
@@ -26,6 +23,8 @@ def convert_spherical(input):
         result.append(math.acos(input[-2]/r))
     else:
         result.append(2*math.pi - math.acos(input[-2] /r))
+
+    print(result)
     if(ischeck): #input == Numpy
         result = np.array(result)
     return result
@@ -42,7 +41,7 @@ def convert_rectangular(input):
     r = input[0]
     multi_sin = 1
     result =[]
-    for i in range(1, numpy_length-2):
+    for i in range(1, numpy_length-1):
         result.append(r*multi_sin*math.cos(input[i]))
         multi_sin *= math.sin(input[i])
     result.append(r*multi_sin*math.cos(input[-1]))
