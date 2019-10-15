@@ -2,15 +2,15 @@ from setuptools import setup, find_packages
 
 setup(
     name             = 'n_sphere',
-    version          = '1.0.0',
+    version          = '1.0.2',
     description      = 'Convert to Spherical Coordination or Rectangular Coordination in Python',
     author           = 'Yunseong Jeong',
     author_email     = 'Yunseong14@naver.com',
     url              = 'https://github.com/Yunseong-Jeong/n_sphere',
-    download_url     = '',
+    download_url     = 'https://github.com/Yunseong-Jeong/n_sphere/archive/master.zip',
     install_requires = [],
     packages         = [],
-    keywords         = ['Spherical Coordinate', 'Rectangular Coordination', 'Python', 'Real Number'],
+    keywords         = ['Hyper Sphere','n-sphere','Spherical Coordinate', 'Rectangular Coordination', 'Python', 'Real Number'],
     python_requires  = '>=3',
     package_data     =  {
     },

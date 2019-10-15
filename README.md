@@ -3,6 +3,9 @@ Spherical Coordinate system, Rectangular coordinate system in N-sphere (Using Py
 
 https://pypi.org/project/n-sphere/
 
+# Project Object
+https://en.wikipedia.org/wiki/N-sphere
+
 # How to Use
 
 pip install n-sphere
