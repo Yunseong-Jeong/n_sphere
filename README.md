@@ -9,3 +9,6 @@ https://en.wikipedia.org/wiki/N-sphere
 # How to Use
 
 pip install n-sphere
+
+# Hello!!
+Hello ~~
