@@ -6,7 +6,7 @@ import math
 def convert_spherical(input, digits= None):
     # Check Numpy or list
     if digits is None:
-        digits = 11; # Fixed Digits But if you want to change value, It can be helpful
+        digits = 6; # Fixed Digits But if you want to change value, It can be helpful
     ischeck = False
     if(type(input).__name__ != 'list'):
         if (input.ndim > 1):
@@ -32,7 +32,7 @@ def convert_spherical(input, digits= None):
 def convert_rectangular(input,digits=None):
     # Check Numpy or list
     if digits is None:
-        digits = 11
+        digits = 6
     ischeck = False
     if (type(input).__name__ != 'list'):
         if (input.ndim > 1):
