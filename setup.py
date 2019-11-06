@@ -27,4 +27,4 @@ setup(
         'Programming Language :: Python :: 3.7'
     ]
 )
-# 연습중연습중
+# setup.py
