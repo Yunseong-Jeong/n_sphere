@@ -14,3 +14,6 @@ pip install n-sphere
 
 # Contact Us
 yunseong14@naver.com
+
+# 컨트리뷰터?? 
+Djunnni 저 빼주셔야 되요!!
