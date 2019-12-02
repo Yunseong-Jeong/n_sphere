@@ -4,15 +4,24 @@ Spherical Coordinate system, Rectangular coordinate system in N-sphere (Using Py
 
 https://pypi.org/project/n-sphere/
 
+- Spherical Coordinate
+
+
 # Project Object
 
 https://en.wikipedia.org/wiki/N-sphere
 
 # How to Use
-
+'''
 pip install n-sphere
+'''
+
+
+
 
 # Contact Us
 yunseong14@naver.com
 
-# Contributor
+# Reference
+- N-sphere(https://en.wikipedia.org/wiki/N-sphere)
+- Stereographic projection(https://en.wikipedia.org/wiki/Stereographic_projection)
