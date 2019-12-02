@@ -48,4 +48,25 @@ def convert_rectangular(input,digits=None):
         multi_sin *= math.sin(input[i])
     result.append(round(r*multi_sin*math.cos(input[-1]),digits))
     result.append(round(r*multi_sin*math.sin(input[-1]),digits))
+    if (ischeck):  # input == Numpy
+        result = np.array(result)
+    return result
+
+
+def Stereographic_Projection(input, digits=None):
+    last_index = input[-1];
+    if digits is None:
+        digits = 6; # Fixed Digits But if you want to change value, It can be helpful
+    ischeck = False
+    if(type(input).__name__ != 'list'):
+        if (input.ndim > 1):
+            input = input.flatten
+        input = input.tolist()
+        ischeck =True
+    numpy_length = len(input)
+    result = []
+    for i in range(0, numpy_length-1):
+        result.append(round((input[i] / (1-last_index)),digits))
+    if(ischeck):
+        result = np.array(result)
     return result
