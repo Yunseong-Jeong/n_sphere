@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name             = 'n_sphere',
-    version          = '1.0.8.1',
+    version          = '1.1.0',
     description      = 'Convert to Spherical Coordination or Rectangular Coordination in Python',
     long_description = open('README.md').read(),
     author           = 'Yunseong Jeong',
