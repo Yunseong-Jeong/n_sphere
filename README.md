@@ -5,16 +5,18 @@ Spherical Coordinate system, Rectangular coordinate system in N-sphere (Using Py
 https://pypi.org/project/n-sphere/
 
 - Spherical Coordinate
+- Rectangular Coordinate
+- Stereographic Projection
+- Generating random points (Plan)
 
 
 # Project Object
-
 https://en.wikipedia.org/wiki/N-sphere
 
 # How to Use
-'''
+```
 pip install n-sphere
-'''
+```
 
 
 
