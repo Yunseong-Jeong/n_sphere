@@ -25,5 +25,5 @@ pip install n-sphere
 yunseong14@naver.com
 
 # Reference
-- N-sphere(https://en.wikipedia.org/wiki/N-sphere)
-- Stereographic projection(https://en.wikipedia.org/wiki/Stereographic_projection)
+- [N-sphere](https://en.wikipedia.org/wiki/N-sphere)
+- [Stereographic projection](https://en.wikipedia.org/wiki/Stereographic_projection)
