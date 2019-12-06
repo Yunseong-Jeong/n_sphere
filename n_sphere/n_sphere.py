@@ -32,9 +32,9 @@ def convert_spherical(input, digits= None):
             convert.append(round(math.acos(input[i]/r),digits))
             r=math.sqrt(r*r - input[i]*input[i])
         if(input[-2]>=0):
-            convert.append(math.acos(input[-2]/r))
+            convert.append(round(math.acos(input[-2]/r),digits))
         else:
-            convert.append(2*math.pi - math.acos(input[-2]/r))
+            convert.append(round(2*math.pi - math.acos(input[-2]/r),digits))
         result = convert
         if(input_type=='ndarray'):
             result = np.array(result)
@@ -86,15 +86,22 @@ def convert_rectangular(input,digits=None):
         r = input[0]
         multi_sin = 1
         convert=[]
-        for i in range(1, len(input)-1):
-            convert.append(r* multi_sin * math.cos(input[i]))
-            multi_sin *= math.sin(input[i])
-        convert.append(r*multi_sin*math.cos(input[-1]))
-        convert.append(r*multi_sin*math.sin(input[-1]))
-        if(input_type != 'list'):
+        if(input_type == 'Tensor'):
+            for i in range(1, len(input)-1):
+                convert.append(r* multi_sin * math.cos(input[i]))
+                multi_sin *= math.sin(input[i])
+            convert.append(r*multi_sin*math.cos(input[-1]))
+            convert.append(r*multi_sin*math.sin(input[-1]))
             convert = np.array(convert)
-            if(input_type=='Tensor'):
-                convert = torch.from_numpy(convert)
+            convert = torch.from_numpy(convert)
+        else:
+            for i in range(1, len(input)-1):
+                convert.append(round(r* multi_sin * math.cos(input[i]),digits))
+                multi_sin *= math.sin(input[i])
+            convert.append(round(r*multi_sin*math.cos(input[-1]),digits))
+            convert.append(round(r*multi_sin*math.sin(input[-1]),digits))
+            if(input_type != 'list'):
+                convert = np.array(convert)
         result = convert
     else:
         #over 2-dimension
@@ -102,22 +109,27 @@ def convert_rectangular(input,digits=None):
             r = input[element][0]
             multi_sin = 1
             convert =[]
-            for i in range(1, len(input[element])-1):
-                #convert.append(round(r*multi_sin*math.cos(input[element][i]),digits))
-                convert.append(r * multi_sin * math.cos(input[element][i]))
-                multi_sin *= math.sin(input[element][i])
-            #convert.append(round(r*multi_sin*math.cos(input[element][-1]),digits))
-            #convert.append(round(r*multi_sin*math.sin(input[element][-1]),digits))
-            convert.append(r*multi_sin*math.cos(input[element][-1]))
-            convert.append(r*multi_sin*math.sin(input[element][-1]))
-            if (type(input).__name__ != 'list'):  # input == Numpy or Tensor
+            if(input_type =='Tensor'):
+                for i in range(1, len(input[element])-1):
+                    convert.append(r * multi_sin * math.cos(input[element][i]))
+                    multi_sin *= math.sin(input[element][i])
+                convert.append(r*multi_sin*math.cos(input[element][-1]))
+                convert.append(r*multi_sin*math.sin(input[element][-1]))
                 convert = np.array(convert)
-                if (type(input).__name__ == 'Tensor'):
-                    convert = torch.from_numpy(convert)
-            result +=[convert]
-        if (type(input).__name__ == 'ndarray'):
+                convert = torch.from_numpy(convert)
+                result +=[convert]
+            else:
+                for i in range(1, len(input[element])-1):
+                    convert.append(round(r * multi_sin * math.cos(input[element][i]),digits))
+                    multi_sin *= math.sin(input[element][i])
+                convert.append(round(r*multi_sin*math.cos(input[element][-1]),digits))
+                convert.append(round(r*multi_sin*math.sin(input[element][-1]),digits))
+                if (input_type != 'list'):  # input == Numpy or Tensor
+                    convert = np.array(convert)
+                result +=[convert]
+        if (input_type == 'ndarray'):
             result = np.array(result)
-        elif (type(input).__name__ == 'Tensor'):
+        elif (input_type == 'Tensor'):
             result = torch.stack(result)
     return result
 

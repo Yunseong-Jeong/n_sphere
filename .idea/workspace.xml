@@ -3,7 +3,10 @@
   <component name="ChangeListManager">
     <list default="true" id="9dbfe68c-9202-4a4e-a196-34d0de382d05" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/n_sphere.py" beforeDir="false" afterPath="$PROJECT_DIR$/n_sphere.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/__init__.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/n_sphere.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/setup.py" beforeDir="false" afterPath="$PROJECT_DIR$/setup.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -22,6 +25,11 @@
   <component name="PropertiesComponent">
     <property name="last_opened_file_path" value="$PROJECT_DIR$" />
     <property name="settings.editor.selected.configurable" value="configurable.group.appearance" />
+  </component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\jbnu\Desktop\Yunseong's WORK\19년도\2학기\OSS\Projects\n_sphere" />
+    </key>
   </component>
   <component name="RunManager">
     <configuration name="n_sphere" type="PythonConfigurationType" factoryName="Python" temporary="true">
@@ -90,9 +98,28 @@
     </option>
   </component>
   <component name="WindowStateProjectService">
-    <state x="664" y="347" key="com.intellij.ide.util.TipDialog" timestamp="1575426583844">
+    <state x="683" y="155" key="#n_sphere" timestamp="1575533363817">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state x="664" y="347" key="com.intellij.ide.util.TipDialog/0.0.1920.1040/1920.0.1920.1080/3840.0.1600.900@0.0.1920.1040" timestamp="1575426583844" />
+    <state x="683" y="155" key="#n_sphere/0.0.1920.1040/1920.0.1920.1080/3840.0.1600.900@0.0.1920.1040" timestamp="1575533363817" />
+    <state x="664" y="347" key="com.intellij.ide.util.TipDialog" timestamp="1575608090443">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="664" y="347" key="com.intellij.ide.util.TipDialog/0.0.1920.1040/1920.0.1920.1080/3840.0.1600.900@0.0.1920.1040" timestamp="1575608090443" />
+    <state x="623" y="225" width="672" height="678" key="search.everywhere.popup" timestamp="1575528260406">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="623" y="225" width="672" height="678" key="search.everywhere.popup/0.0.1920.1040/1920.0.1920.1080/3840.0.1600.900@0.0.1920.1040" timestamp="1575528260406" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$USER_HOME$/AppData/Local/Programs/Python/Python37/Lib/site-packages/torch/__init__.py</url>
+          <line>12</line>
+          <option name="timeStamp" value="1" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
   </component>
 </project>
