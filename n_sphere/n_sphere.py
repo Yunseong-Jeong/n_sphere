@@ -83,67 +83,53 @@ def convert_rectangular(input,digits=None):
     if(input_type=='list'):
         input = np.array(input)
     if(input.ndim==1):
-        r = input[0]
-        multi_sin = 1
-        convert=[]
-        if(input_type == 'Tensor'):
-            for i in range(1, len(input)-1):
-                convert.append(r* multi_sin * math.cos(input[i]))
-                multi_sin *= math.sin(input[i])
-            convert.append(r*multi_sin*math.cos(input[-1]))
-            convert.append(r*multi_sin*math.sin(input[-1]))
-            convert = np.array(convert)
-            convert = torch.from_numpy(convert)
-        else:
-            for i in range(1, len(input)-1):
-                convert.append(round(r* multi_sin * math.cos(input[i]),digits))
-                multi_sin *= math.sin(input[i])
-            convert.append(round(r*multi_sin*math.cos(input[-1]),digits))
-            convert.append(round(r*multi_sin*math.sin(input[-1]),digits))
-            if(input_type != 'list'):
-                convert = np.array(convert)
-        result = convert
+        result = _rectangular_of_vector(input, digits)
+        if(input_type == 'ndarray'):
+            result = np.array(result)
+        elif(input_type == 'Tensor'):
+            result = torch.tensor(result, dtype=torch.float64)
     else:
         #over 2-dimension
         for element in range (0, len(input)):
-            r = input[element][0]
-            multi_sin = 1
-            convert =[]
-            if(input_type =='Tensor'):
-                for i in range(1, len(input[element])-1):
-                    convert.append(r * multi_sin * math.cos(input[element][i]))
-                    multi_sin *= math.sin(input[element][i])
-                convert.append(r*multi_sin*math.cos(input[element][-1]))
-                convert.append(r*multi_sin*math.sin(input[element][-1]))
+            convert = _rectangular_of_vector(input[element], digits)
+            if (input_type != 'list'):  # input == Numpy or Tensor
                 convert = np.array(convert)
-                convert = torch.from_numpy(convert)
-                result +=[convert]
-            else:
-                for i in range(1, len(input[element])-1):
-                    convert.append(round(r * multi_sin * math.cos(input[element][i]),digits))
-                    multi_sin *= math.sin(input[element][i])
-                convert.append(round(r*multi_sin*math.cos(input[element][-1]),digits))
-                convert.append(round(r*multi_sin*math.sin(input[element][-1]),digits))
-                if (input_type != 'list'):  # input == Numpy or Tensor
-                    convert = np.array(convert)
-                result +=[convert]
+                if(input_type == 'Tensor'):
+                    convert = torch.from_numpy(convert)
+            result +=[convert]
         if (input_type == 'ndarray'):
             result = np.array(result)
         elif (input_type == 'Tensor'):
             result = torch.stack(result)
     return result
 
+def _rectangular_of_vector(vector, digits):
+    # Convert one spherical vector [r, Phi_1, ..., Phi_n-1] to [x_1, ..., x_n].
+    # Plain floats are used so that `digits` rounding also works for Tensor input.
+    values = [float(v) for v in vector]
+    if(len(values) < 2):
+        raise ValueError("convert_rectangular needs at least 2 values (r and one angle)")
+    r = values[0]
+    multi_sin = 1.0
+    convert = []
+    for i in range(1, len(values)-1):
+        convert.append(round(r * multi_sin * math.cos(values[i]), digits))
+        multi_sin *= math.sin(values[i])
+    convert.append(round(r*multi_sin*math.cos(values[-1]), digits))
+    convert.append(round(r*multi_sin*math.sin(values[-1]), digits))
+    return convert
+
 #### Temporary Not Use
 def Stereographic_Projection(input, digits=None):
-    last_index = input[-1];
     if digits is None:
         digits = 6; # Fixed Digits But if you want to change value, It can be helpful
     ischeck = False
     if(type(input).__name__ != 'list'):
         if (input.ndim > 1):
-            input = input.flatten
+            input = input.flatten()
         input = input.tolist()
         ischeck =True
+    last_index = input[-1];
     numpy_length = len(input)
     result = []
     for i in range(0, numpy_length-1):
