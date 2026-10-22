@@ -23,37 +23,14 @@ def convert_spherical(input, digits= None):
         input = np.array(input)
     #over 2-dimension (current available 2-dimension)
     if(input.ndim==1):
-        r = 0
-        for i in range(0,len(input)):
-            r += input[i]*input[i]
-        r=math.sqrt(r)
-        convert = [r]
-        for i in range(0, len(input)-2):
-            convert.append(round(math.acos(input[i]/r),digits))
-            r=math.sqrt(r*r - input[i]*input[i])
-        if(input[-2]>=0):
-            convert.append(round(math.acos(input[-2]/r),digits))
-        else:
-            convert.append(round(2*math.pi - math.acos(input[-2]/r),digits))
-        result = convert
+        result = _spherical_of_vector(input, digits)
         if(input_type=='ndarray'):
             result = np.array(result)
         elif(input_type== 'Tensor'):
-            result = torch.stack(result)
+            result = torch.tensor(result, dtype=torch.float64)
     else:
         for element in range(0, len(input)):
-            r = 0
-            for i in range(0, len(input[element])):
-                r += input[element][i]*input[element][i]
-            r = math.sqrt(r)
-            convert = [r]
-            for i in range (0 ,len(input[element])-2):
-                convert.append(round(math.acos(input[element][i] / r),digits))
-                r = math.sqrt(r*r - input[element][i]*input[element][i])
-            if(input[element][-2] >= 0):
-                convert.append(math.acos(input[element][-2]/r))
-            else:
-                convert.append(2*math.pi - math.acos(input[element][-2] /r))
+            convert = _spherical_of_vector(input[element], digits)
             if(type(input[element]).__name__ != 'list'): #input == Numpy or Tensor
                 convert = np.array(convert)
                 if(type(input[element]).__name__ == 'Tensor'):
@@ -64,6 +41,29 @@ def convert_spherical(input, digits= None):
         elif(type(input).__name__=='Tensor'):
             result = torch.stack(result)
     return result
+
+def _spherical_of_vector(vector, digits):
+    # Convert one rectangular vector [x_1, ..., x_n] to [r, Phi_1, ..., Phi_n-1].
+    # The remaining radius is never obtained by subtracting squares (that can go
+    # slightly negative or push acos() outside [-1, 1] through rounding error);
+    # the suffix norms sqrt(x_i^2 + ... + x_n^2) are accumulated with hypot instead.
+    values = [float(v) for v in vector]
+    n = len(values)
+    if(n < 2):
+        raise ValueError("convert_spherical needs at least 2 dimensions")
+    tail = [0.0] * (n + 1)  # tail[i] = sqrt(x_i^2 + ... + x_n^2), tail[n] = 0
+    for i in range(n - 1, -1, -1):
+        tail[i] = math.hypot(tail[i + 1], values[i])
+    convert = [tail[0]]
+    for i in range(0, n - 2):
+        # Phi_i = acos(x_i / tail[i]) written with atan2: always in [0, Pi], no domain error
+        convert.append(round(math.atan2(tail[i + 1], values[i]), digits))
+    # Last angle: the sign of x_n (values[-1]) decides between [0, Pi] and (Pi, 2*Pi)
+    last = math.atan2(values[-1], values[-2])
+    if(last < 0):
+        last += 2 * math.pi
+    convert.append(round(last, digits))
+    return convert
 
 def convert_rectangular(input,digits=None):
     if (not (
