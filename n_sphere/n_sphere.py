@@ -1,123 +1,88 @@
 # N-sphere Convert to Spherical or Rectangular Coordination
 
 import numpy as np
-import math
 import torch
 
+_VALID_TYPES = ('Tensor', 'ndarray', 'float', 'int', 'list')
+
 def convert_spherical(input, digits= None):
-    if(not(
-            type(input).__name__ == 'Tensor'
-        or  type(input).__name__ == 'ndarray'
-        or  type(input).__name__ == 'float'
-        or  type(input).__name__ == 'int'
-        or  type(input).__name__ == 'list'
-    )):
+    if(type(input).__name__ not in _VALID_TYPES):
         print("Input Error")
         return -1
-    # Check Numpy or list
     if digits is None:
         digits = 6 # Fixed Digits But if you want to change value, It can be helpful
-    result =[]
     input_type = type(input).__name__
-    if(input_type == 'list'):
-        input = np.array(input)
-    #over 2-dimension (current available 2-dimension)
-    if(input.ndim==1):
-        result = _spherical_of_vector(input, digits)
-        if(input_type=='ndarray'):
-            result = np.array(result)
-        elif(input_type== 'Tensor'):
-            result = torch.tensor(result, dtype=torch.float64)
-    else:
-        for element in range(0, len(input)):
-            convert = _spherical_of_vector(input[element], digits)
-            if(type(input[element]).__name__ != 'list'): #input == Numpy or Tensor
-                convert = np.array(convert)
-                if(type(input[element]).__name__ == 'Tensor'):
-                    convert = torch.from_numpy(convert)
-            result += [convert]
-        if(type(input).__name__ == 'ndarray'):
-            result = np.array(result)
-        elif(type(input).__name__=='Tensor'):
-            result = torch.stack(result)
-    return result
-
-def _spherical_of_vector(vector, digits):
-    # Convert one rectangular vector [x_1, ..., x_n] to [r, Phi_1, ..., Phi_n-1].
-    # The remaining radius is never obtained by subtracting squares (that can go
-    # slightly negative or push acos() outside [-1, 1] through rounding error);
-    # the suffix norms sqrt(x_i^2 + ... + x_n^2) are accumulated with hypot instead.
-    values = [float(v) for v in vector]
-    n = len(values)
-    if(n < 2):
-        raise ValueError("convert_spherical needs at least 2 dimensions")
-    tail = [0.0] * (n + 1)  # tail[i] = sqrt(x_i^2 + ... + x_n^2), tail[n] = 0
-    for i in range(n - 1, -1, -1):
-        tail[i] = math.hypot(tail[i + 1], values[i])
-    convert = [tail[0]]
-    for i in range(0, n - 2):
-        # Phi_i = acos(x_i / tail[i]) written with atan2: always in [0, Pi], no domain error
-        convert.append(round(math.atan2(tail[i + 1], values[i]), digits))
-    # Last angle: the sign of x_n (values[-1]) decides between [0, Pi] and (Pi, 2*Pi)
-    last = math.atan2(values[-1], values[-2])
-    if(last < 0):
-        last += 2 * math.pi
-    convert.append(round(last, digits))
-    return convert
+    result = _spherical_array(_to_float_array(input, input_type), digits)
+    # A 1-D list comes back as a list, a 2-D (or larger) list as a numpy array
+    return _wrap_result(result, input_type, list_max_ndim=1)
 
 def convert_rectangular(input,digits=None):
-    if (not (
-            type(input).__name__ == 'Tensor'
-            or type(input).__name__ == 'ndarray'
-            or type(input).__name__ == 'float'
-            or type(input).__name__ == 'int'
-            or type(input).__name__ == 'list'
-    )):
+    if(type(input).__name__ not in _VALID_TYPES):
         print("Input Error")
         return -1
-    # Check Numpy or list
     if digits is None:
         digits = 6
-    result = []
     input_type = type(input).__name__
-    if(input_type=='list'):
-        input = np.array(input)
-    if(input.ndim==1):
-        result = _rectangular_of_vector(input, digits)
-        if(input_type == 'ndarray'):
-            result = np.array(result)
-        elif(input_type == 'Tensor'):
-            result = torch.tensor(result, dtype=torch.float64)
-    else:
-        #over 2-dimension
-        for element in range (0, len(input)):
-            convert = _rectangular_of_vector(input[element], digits)
-            if (input_type != 'list'):  # input == Numpy or Tensor
-                convert = np.array(convert)
-                if(input_type == 'Tensor'):
-                    convert = torch.from_numpy(convert)
-            result +=[convert]
-        if (input_type == 'ndarray'):
-            result = np.array(result)
-        elif (input_type == 'Tensor'):
-            result = torch.stack(result)
+    result = _rectangular_array(_to_float_array(input, input_type), digits)
+    # A list always comes back as a (nested) list
+    return _wrap_result(result, input_type, list_max_ndim=None)
+
+def _to_float_array(input, input_type):
+    # Tensor / ndarray / list -> float64 numpy array. The last axis holds one point,
+    # every leading axis is a batch axis, so (n,), (m, n) and (b, m, n) all work.
+    if(input_type == 'Tensor'):
+        input = input.detach().cpu().numpy()
+    array = np.asarray(input, dtype=np.float64)
+    if(array.ndim < 1):
+        raise ValueError("input must be a vector or an array of vectors, not a scalar")
+    if(array.shape[-1] < 2):
+        raise ValueError("every vector needs at least 2 values")
+    return array
+
+def _wrap_result(result, input_type, list_max_ndim):
+    if(input_type == 'Tensor'):
+        return torch.from_numpy(result)
+    if(input_type == 'list' and (list_max_ndim is None or result.ndim <= list_max_ndim)):
+        return result.tolist()
     return result
 
-def _rectangular_of_vector(vector, digits):
-    # Convert one spherical vector [r, Phi_1, ..., Phi_n-1] to [x_1, ..., x_n].
-    # Plain floats are used so that `digits` rounding also works for Tensor input.
-    values = [float(v) for v in vector]
-    if(len(values) < 2):
-        raise ValueError("convert_rectangular needs at least 2 values (r and one angle)")
-    r = values[0]
-    multi_sin = 1.0
-    convert = []
-    for i in range(1, len(values)-1):
-        convert.append(round(r * multi_sin * math.cos(values[i]), digits))
-        multi_sin *= math.sin(values[i])
-    convert.append(round(r*multi_sin*math.cos(values[-1]), digits))
-    convert.append(round(r*multi_sin*math.sin(values[-1]), digits))
-    return convert
+def _spherical_array(X, digits):
+    # [x_1, ..., x_n] -> [r, Phi_1, ..., Phi_n-1] for every vector on the last axis.
+    # Scaling by the largest |x| first keeps the squares from overflowing/underflowing.
+    # The remaining radii are suffix norms sqrt(x_i^2 + ... + x_n^2) built from a
+    # cumulative sum (no subtraction, so they never go negative through rounding),
+    # and the angles use atan2, so there is no acos() domain error.
+    scale = np.max(np.abs(X), axis=-1, keepdims=True)
+    scale[scale == 0] = 1.0
+    S = X / scale
+    tail = np.sqrt(np.cumsum((S * S)[..., ::-1], axis=-1))[..., ::-1]  # tail[..., i] = sqrt(S_i^2 + ... + S_n^2)
+    out = np.empty(X.shape, dtype=np.float64)
+    out[..., 0] = tail[..., 0] * scale[..., 0]
+    # Phi_i = acos(x_i / tail_i) written with atan2: always in [0, Pi]
+    out[..., 1:-1] = np.round(np.arctan2(tail[..., 1:-1], S[..., :-2]), digits)
+    # Last angle: the sign of x_n decides between [0, Pi] and (Pi, 2*Pi)
+    last = np.arctan2(S[..., -1], S[..., -2])
+    out[..., -1] = np.round(np.where(last < 0, last + 2 * np.pi, last), digits)
+    return out
+
+def _rectangular_array(P, digits):
+    # [r, Phi_1, ..., Phi_n-1] -> [x_1, ..., x_n] for every vector on the last axis.
+    r = P[..., :1]
+    angle = P[..., 1:]
+    # sin_prod[..., k] = sin(Phi_1) * ... * sin(Phi_k)  (1 for k = 0)
+    sin_prod = np.ones(angle.shape, dtype=np.float64)
+    sin_prod[..., 1:] = np.cumprod(np.sin(angle[..., :-1]), axis=-1)
+    out = np.empty(P.shape, dtype=np.float64)
+    out[..., :-1] = r * sin_prod * np.cos(angle)
+    out[..., -1] = r[..., 0] * sin_prod[..., -1] * np.sin(angle[..., -1])
+    return _round(out, digits)
+
+def _round(array, digits):
+    # np.round multiplies by 10**digits, which overflows for values near the float limit.
+    # Such values have no fractional digits left to round, so they are kept as they are.
+    with np.errstate(over='ignore', invalid='ignore'):
+        rounded = np.round(array, digits)
+    return np.where(np.isfinite(rounded), rounded, array)
 
 #### Temporary Not Use
 def Stereographic_Projection(input, digits=None):
